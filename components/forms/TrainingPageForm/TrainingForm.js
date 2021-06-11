@@ -61,7 +61,7 @@ export default function TrainingFrom({ setTrigger }) {
       )}
       {!!activityType && (
         <View style={{ padding: 25 }}>
-          <Text style={{ textAlign: "center", fontSize: 22, color: "red" }}>
+          <Text style={{ textAlign: "center", fontSize: 22, color: "#A63030" }}>
             {invalidInput && "Enter data!!"}
           </Text>
           <Input

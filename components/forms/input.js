@@ -14,8 +14,8 @@ export default function Input({ val, setVal, more, error }) {
         style,
         {
           backgroundColor: isError,
-          color: error && "#fff",
-          borderColor: error && "#AC1D1D",
+          color: error ? "#ffffff" : "#000",
+          borderColor: error ? "#AC1D1D" : "#000",
         },
       ]}
       placeholder={placeholder}
@@ -28,5 +28,6 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 5,
     borderBottomWidth: 3,
+    color: "#000",
   },
 });
