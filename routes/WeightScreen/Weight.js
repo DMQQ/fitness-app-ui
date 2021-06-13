@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import {
-    View,
-    Text,
-    ScrollView,
-    Alert,
-    Keyboard,
-    FlatList,
+   View,
+   Text,
+   ScrollView,
+   Alert,
+   Keyboard,
+   FlatList,
 } from "react-native";
 import Input from "../../components/forms/input";
 import { styles } from "./styles";
@@ -19,166 +19,167 @@ import WeightChart from "./WeightChart";
 import WeightListItem from "./WeightListItem";
 
 export default function Weight() {
-    const [weight, setWeight] = useState("");
-    const [error, setError] = useState("");
-    const [list, setList] = useState([]);
-    const [refresh, setRefresh] = useState(0);
+   const [weight, setWeight] = useState("");
+   const [error, setError] = useState("");
+   const [list, setList] = useState([]);
+   const [refresh, setRefresh] = useState(0);
 
-    const { isAuth } = useContext(AuthContext);
+   const { isAuth } = useContext(AuthContext);
 
-    const AddWeight = async () => {
-        if (!weight) return setError("Fill the form!!");
-        if (!isAuth) return setError("No user provided, log in again");
-        if (+weight === 0 || +weight > 1000)
-            return setError("Enter valid weight");
+   const AddWeight = async () => {
+      if (!weight) return setError("Fill the form!!");
+      if (!isAuth) return setError("No user provided, log in again");
+      if (+weight === 0 || +weight > 1000)
+         return setError("Enter valid weight");
 
-        await fetch(CONSTS.BACKEND + "/weight", {
-            method: "POST",
-            body: JSON.stringify({
-                weight: +weight,
-                user_id: isAuth.id,
-            }),
+      await fetch(CONSTS.BACKEND + "/weight", {
+         method: "POST",
+         body: JSON.stringify({
+            weight: +weight,
+            user_id: isAuth.id,
+         }),
+         headers: {
+            "Content-Type": "application/json",
+            User: isAuth.login,
+            token: isAuth.jwt,
+         },
+      })
+         .then((res) => {
+            return res.json();
+         })
+         .then((data) => {
+            if (data != null) {
+               setWeight("");
+               return Keyboard.dismiss();
+            }
+         })
+         .catch((err) => {
+            console.log(err);
+            setError("Something went wrong during Adding weight");
+            Keyboard.dismiss();
+         })
+         .finally(() => {
+            setRefresh(refresh + 1);
+            setError("");
+         });
+   };
+
+   useEffect(() => {
+      async function FetchStats() {
+         await fetch(CONSTS.BACKEND + "/get/weight/" + isAuth.id, {
+            method: "GET",
             headers: {
-                "Content-Type": "application/json",
-                User: isAuth.login,
-                token: isAuth.jwt,
+               token: isAuth.jwt,
+               User: isAuth.login,
             },
-        })
+         })
             .then((res) => {
-                return res.json();
+               if (!res.ok) Alert.alert("Error", "Something went wrong:<");
+               return res.json();
             })
             .then((data) => {
-                if (data != null) {
-                    setWeight("");
-                    return Keyboard.dismiss();
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                setError("Something went wrong during Adding weight");
-                Keyboard.dismiss();
-            })
-            .finally(() => {
-                setRefresh(refresh + 1);
-                setError("");
+               if (data) {
+                  setList(data);
+               }
             });
-    };
+      }
+      FetchStats();
+   }, [refresh]);
 
-    useEffect(() => {
-        async function FetchStats() {
-            await fetch(CONSTS.BACKEND + "/get/weight/" + isAuth.id, {
-                method: "GET",
-                headers: {
-                    token: isAuth.jwt,
-                    User: isAuth.login,
-                },
-            })
-                .then((res) => {
-                    if (!res.ok) Alert.alert("Error", "Something went wrong:<");
-                    return res.json();
-                })
-                .then((data) => {
-                    if (data) {
-                        setList(data);
-                    }
-                });
-        }
-        FetchStats();
-    }, [refresh]);
+   useEffect(() => {
+      if (weight && weight.trim() !== "") {
+         setError("");
+      }
+   }, [weight]);
 
-    useEffect(() => {
-        if (weight && weight.trim() !== "") {
-            setError("");
-        }
-    }, [weight]);
+   const ArrayOfValues =
+      list && list.length > 0 && list.map((el) => el.weight).reverse();
+   const ArrayOfDates =
+      list && list.length > 0 && list.map((el) => el.post_date).reverse();
 
-    const ArrayOfValues =
-        list && list.length > 0 && list.map((el) => el.weight).reverse();
-    const ArrayOfDates =
-        list && list.length > 0 && list.map((el) => el.post_date).reverse();
+   const isArrayOfValues = ArrayOfValues ? ArrayOfValues : [100, 200];
+   const isArrayOfDates = ArrayOfDates ? ArrayOfDates : ["Error", "Error"];
 
-    const isArrayOfValues = ArrayOfValues ? ArrayOfValues : [100, 200];
-    const isArrayOfDates = ArrayOfDates ? ArrayOfDates : ["Error", "Error"];
+   async function onSwipeDelete(id) {
+      try {
+         const res = await fetch(CONSTS.BACKEND + "/delete/weight/" + id, {
+            method: "DELETE",
+            headers: {
+               token: isAuth.jwt,
+               User: isAuth.login,
+            },
+         });
+         const data = await res.json();
+         if (data !== null) {
+            setRefresh(refresh + 1);
+         }
+      } catch (error) {
+         Alert.alert("Error", error);
+      }
+   }
 
-    async function onSwipeDelete(id) {
-        try {
-            const res = await fetch(CONSTS.BACKEND + "/delete/weight/" + id, {
-                method: "DELETE",
-                headers: {
-                    token: isAuth.jwt,
-                    User: isAuth.login,
-                },
-            });
-            const data = await res.json();
-            if (data !== null) {
-                setRefresh(refresh + 1);
-            }
-        } catch (error) {
-            Alert.alert("Error", error);
-        }
-    }
+   return (
+      <ScrollView>
+         <View style={styles.container}>
+            <Text style={styles.title}>Weight</Text>
+            <Bar />
+            <View style={styles.form}>
+               <Text
+                  style={[
+                     { textAlign: "center", fontSize: 22, padding: 5 },
+                     { color: error ? "#E33838" : "#000" },
+                  ]}
+               >
+                  {error ? error : "What's your todays weight?"}
+               </Text>
+               <Input
+                  val={weight}
+                  setVal={setWeight}
+                  more={{ placeholder: "Weight", style: { margin: 10 } }}
+                  error={error}
+                  keyboardType="numeric"
+               />
 
-    return (
-        <ScrollView>
-            <View style={styles.container}>
-                <Text style={styles.title}>Weight</Text>
-                <Bar />
-                <View style={styles.form}>
-                    <Text
-                        style={[
-                            { textAlign: "center", fontSize: 22, padding: 5 },
-                            { color: error ? "#E33838" : "#000" },
-                        ]}
-                    >
-                        {error ? error : "What's your todays weight?"}
-                    </Text>
-                    <Input
-                        val={weight}
-                        setVal={setWeight}
-                        more={{ placeholder: "Weight", style: { margin: 10 } }}
-                        error={error}
-                    />
-
-                    <CustomBtn
-                        title="Add Weight"
-                        func={AddWeight}
-                        styles={{ backgroundColor: "#009B85" }}
-                    />
-                    <View style={{ alignItems: "center", padding: 10 }}>
-                        <Bar />
-                    </View>
-                </View>
-                <View
-                    style={{
-                        width: "100%",
-                        padding: 20,
-                        marginBottom: 50,
-                    }}
-                >
-                    {list && (
-                        <WeightChart
-                            values={isArrayOfValues}
-                            labels={isArrayOfDates}
-                        />
-                    )}
-                    {list.length <= 0 && (
-                        <Text style={{ textAlign: "center", fontSize: 25 }}>
-                            Hey, Add some value :D
-                        </Text>
-                    )}
-
-                    {list &&
-                        list.map((el, index) => (
-                            <WeightListItem
-                                index={index}
-                                el={el}
-                                list={list}
-                                key={el.id}
-                                onSwipeDelete={onSwipeDelete}
-                            />
-                        ))}
-                </View>
+               <CustomBtn
+                  title="Add Weight"
+                  func={AddWeight}
+                  styles={{ backgroundColor: "#009B85" }}
+               />
+               <View style={{ alignItems: "center", padding: 10 }}>
+                  <Bar />
+               </View>
             </View>
-        </ScrollView>
-    );
+            <View
+               style={{
+                  width: "100%",
+                  padding: 20,
+                  marginBottom: 50,
+               }}
+            >
+               {list && (
+                  <WeightChart
+                     values={isArrayOfValues}
+                     labels={isArrayOfDates}
+                  />
+               )}
+               {list.length <= 0 && (
+                  <Text style={{ textAlign: "center", fontSize: 25 }}>
+                     Hey, Add some value :D
+                  </Text>
+               )}
+
+               {list &&
+                  list.map((el, index) => (
+                     <WeightListItem
+                        index={index}
+                        el={el}
+                        list={list}
+                        key={el.id}
+                        onSwipeDelete={onSwipeDelete}
+                     />
+                  ))}
+            </View>
+         </View>
+      </ScrollView>
+   );
 }
