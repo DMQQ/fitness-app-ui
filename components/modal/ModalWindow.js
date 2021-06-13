@@ -1,24 +1,54 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Animated } from "react-native";
 
 import CustomBtn from "../buttons/CustomBtn";
 
-export default function ModalWindow({ message }) {
-  return (
-    <View style={styles.container}>
-      <Text style={{ textAlign: "center", fontSize: 25 }}>{message}</Text>
-      <CustomBtn title="Close" styles={{ width: "95%" }} />
-    </View>
-  );
+export default function ModalWindow({ message, func }) {
+   return (
+      <Animated.View style={[styles.container]}>
+         <Text
+            style={{
+               textAlign: "center",
+               fontSize: 25,
+               color: "white",
+               marginBottom: 10,
+            }}
+         >
+            {message}
+         </Text>
+         <CustomBtn
+            title="Close"
+            styles={{
+               width: "90%",
+               backgroundColor: "#A73333A",
+               borderColor: "white",
+               borderWidth: 1.5,
+            }}
+            func={func}
+         />
+      </Animated.View>
+   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: "90%",
-    height: 180,
-    alignItems: "center",
-    justifyContent: "space-around",
-    borderRadius: 20,
-    backgroundColor: "#F4F4F4",
-  },
+   container: {
+      position: "absolute",
+      zIndex: 15,
+      width: "90%",
+      padding: 15,
+      alignItems: "center",
+      justifyContent: "space-around",
+      borderRadius: 20,
+      backgroundColor: "#BE4D4D",
+      top: 50,
+      shadowColor: "#000",
+      shadowOffset: {
+         width: 0,
+         height: 10,
+      },
+      shadowOpacity: 0.53,
+      shadowRadius: 13.97,
+
+      elevation: 21,
+   },
 });

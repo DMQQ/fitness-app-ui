@@ -52,6 +52,8 @@ export default function FoodForm({ setTrigger, setShowForm }) {
          } catch (error) {
             Alert.alert("Error", error);
          }
+      } else {
+         Alert.alert("Fill the fields");
       }
    };
 

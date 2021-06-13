@@ -1,16 +1,18 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState, Suspense } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import NavigationBar from "../components/NavigationBar";
-import Water from "./WaterScreen/Water";
-import Weight from "./WeightScreen/Weight";
-import Training from "./TrainingScreen/Training";
 import { AuthContext } from "../context/AuthContext";
 import Bar from "../components/design/bar";
-import HomePage from "./HomeScreen/HomePage";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import useGet from "../hooks/useGet";
-import Food from "./FoodScreen/Food";
+import Loader from "../components/Loader/Loader";
 import Sidebar from "../components/Sidebar/Sidebar";
+
+const Food = React.lazy(() => import("./FoodScreen/Food"));
+const Weight = React.lazy(() => import("./WeightScreen/Weight"));
+const Training = React.lazy(() => import("./TrainingScreen/Training"));
+const HomePage = React.lazy(() => import("./HomeScreen/HomePage"));
+const Water = React.lazy(() => import("./WaterScreen/Water"));
 
 const Home = ({ navigation }) => {
    const [page, setPage] = useState("HOME");
@@ -29,29 +31,30 @@ const Home = ({ navigation }) => {
 
    return (
       <View style={styles.container}>
-         {page === "HOME" && (
-            <>
-               <View style={{ alignItems: "center" }}>
-                  <Text style={styles.headerText}>
-                     Hello {isAuth ? isAuth.login : "unknown"}{" "}
-                     <Icon name="users" size={30} color="#004D73" />
-                  </Text>
-                  <Bar />
-               </View>
-               <SideBarBtn
-                  func={() => setShowSidebar(showSidebar === 0 ? -150 : 0)}
-               />
-               <Sidebar currentPos={showSidebar} />
-            </>
-         )}
-         {page === "HOME" && (
-            <HomePage id={isAuth?.id} waterData={water} food={food} />
-         )}
-         {page === "WATER" && <Water />}
-         {page === "TRAINING" && <Training />}
-         {page === "WEIGHT" && <Weight />}
-         {page === "FOOD" && <Food />}
-
+         <Suspense fallback={<Loader />}>
+            {page === "HOME" && (
+               <>
+                  <View style={{ alignItems: "center" }}>
+                     <Text style={styles.headerText}>
+                        Hello {isAuth ? isAuth.login : "unknown"}{" "}
+                        <Icon name="users" size={30} color="#004D73" />
+                     </Text>
+                     <Bar />
+                  </View>
+                  <SideBarBtn
+                     func={() => setShowSidebar(showSidebar === 0 ? -150 : 0)}
+                  />
+                  <Sidebar currentPos={showSidebar} />
+               </>
+            )}
+            {page === "HOME" && (
+               <HomePage id={isAuth?.id} waterData={water} food={food} />
+            )}
+            {page === "WATER" && <Water />}
+            {page === "TRAINING" && <Training />}
+            {page === "WEIGHT" && <Weight />}
+            {page === "FOOD" && <Food />}
+         </Suspense>
          <NavigationBar setPage={setPage} page={page} />
       </View>
    );
@@ -65,7 +68,7 @@ const SideBarBtn = ({ func }) => {
             height: 30,
             position: "absolute",
             right: 10,
-            top: 40,
+            top: 50,
             alignItems: "flex-end",
             justifyContent: "space-around",
          }}

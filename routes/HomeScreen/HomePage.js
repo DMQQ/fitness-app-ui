@@ -29,7 +29,7 @@ const HomePage = ({ data, id, waterData, food }) => {
 
    const arr = FillHomeArray(TrainingData);
    return (
-      <View>
+      <ScrollView>
          <View style={styles.list}>
             <TrippleTile data={arr} />
             <View style={{ margin: 10, alignItems: "center" }}>
@@ -68,7 +68,7 @@ const HomePage = ({ data, id, waterData, food }) => {
                color={["#0046BC", "#009BE2"]}
             />
          </View>
-      </View>
+      </ScrollView>
    );
 };
 

@@ -39,7 +39,11 @@ export default function Training() {
    const TimeGoal = 5;
 
    return (
-      <ScrollView style={{ marginBottom: 60 }}>
+      <ScrollView
+         style={{ marginBottom: 60 }}
+         showsVerticalScrollIndicator={false}
+         bounces={true}
+      >
          <ImageBackground
             source={require("../../images/bg.jpg")}
             style={styles.container}
@@ -89,7 +93,7 @@ export default function Training() {
                      title="Add Activity"
                      func={() => setAddActivity(!addActivity)}
                      styles={{ marginTop: 30, width: "80%", borderRadius: 10 }}
-                     color="#004D73"
+                     color="#0e0a4f"
                      icon="running"
                   />
                </View>

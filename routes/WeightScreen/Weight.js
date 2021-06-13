@@ -6,7 +6,7 @@ import {
    ScrollView,
    Alert,
    Keyboard,
-   FlatList,
+   ActivityIndicator,
 } from "react-native";
 import Input from "../../components/forms/input";
 import { styles } from "./styles";
@@ -18,10 +18,11 @@ import Bar from "../../components/design/bar";
 import WeightChart from "./WeightChart";
 import WeightListItem from "./WeightListItem";
 
+import useGet from "../../hooks/useGet";
+
 export default function Weight() {
    const [weight, setWeight] = useState("");
    const [error, setError] = useState("");
-   const [list, setList] = useState([]);
    const [refresh, setRefresh] = useState(0);
 
    const { isAuth } = useContext(AuthContext);
@@ -64,27 +65,9 @@ export default function Weight() {
          });
    };
 
-   useEffect(() => {
-      async function FetchStats() {
-         await fetch(CONSTS.BACKEND + "/get/weight/" + isAuth.id, {
-            method: "GET",
-            headers: {
-               token: isAuth.jwt,
-               User: isAuth.login,
-            },
-         })
-            .then((res) => {
-               if (!res.ok) Alert.alert("Error", "Something went wrong:<");
-               return res.json();
-            })
-            .then((data) => {
-               if (data) {
-                  setList(data);
-               }
-            });
-      }
-      FetchStats();
-   }, [refresh]);
+   const { data: list, loading } = useGet("/get/weight/" + isAuth.id, [
+      refresh,
+   ]);
 
    useEffect(() => {
       if (weight && weight.trim() !== "") {
@@ -156,17 +139,7 @@ export default function Weight() {
                   marginBottom: 50,
                }}
             >
-               {list && (
-                  <WeightChart
-                     values={isArrayOfValues}
-                     labels={isArrayOfDates}
-                  />
-               )}
-               {list.length <= 0 && (
-                  <Text style={{ textAlign: "center", fontSize: 25 }}>
-                     Hey, Add some value :D
-                  </Text>
-               )}
+               <WeightChart values={isArrayOfValues} labels={isArrayOfDates} />
 
                {list &&
                   list.map((el, index) => (
@@ -178,6 +151,7 @@ export default function Weight() {
                         onSwipeDelete={onSwipeDelete}
                      />
                   ))}
+               {loading && <ActivityIndicator size="large" color="green" />}
             </View>
          </View>
       </ScrollView>
