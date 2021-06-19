@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
    container: {
       margin: 20,
       marginTop: 20,
-      height: CARD_HEIGHT + 70,
+      height: CARD_HEIGHT + 100,
    },
    card: {
       padding: 10,

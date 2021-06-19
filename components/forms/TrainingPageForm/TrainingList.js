@@ -1,13 +1,10 @@
 import React from "react";
 
 //prettier-ignore
-import { ScrollView,View,StyleSheet,Text,Alert,ActivityIndicator} from "react-native";
+import { ScrollView,View,StyleSheet,Text,Alert,ActivityIndicator,ImageBackground} from "react-native";
 
 import useFetch from "../../../hooks/useFetch";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-
-import { LinearGradient } from "expo-linear-gradient";
-
 import Icon from "react-native-vector-icons/FontAwesome5";
 
 export default function TrainingList({ list, setTrigger }) {
@@ -78,10 +75,10 @@ function Activity({
          onSwipeableRightOpen={() => DeleteActivity(id)}
          renderRightActions={RightAction}
       >
-         <LinearGradient
-            colors={["#4000A8", "#0e0a4f"]}
-            start={{ x: 0.2, y: 0.2 }}
-            style={styles.activityContainer}
+         <ImageBackground
+            source={require(`../../../images/sport.jpg`)}
+            style={[styles.activityContainer, { width: "100%" }]}
+            blurRadius={4.5}
          >
             <View style={styles.headerRow}>
                <View style={styles.iconBox}>
@@ -105,7 +102,7 @@ function Activity({
                   )}
                </View>
                <View style={styles.titleContainer}>
-                  <Text style={styles.title}>{type}</Text>
+                  <Text style={[styles.title]}>{type}</Text>
                </View>
             </View>
             <View style={styles.bodyRow}>
@@ -157,19 +154,17 @@ function Activity({
                   <Text style={styles.values}>{dateadd}</Text>
                </View>
             </View>
-         </LinearGradient>
+         </ImageBackground>
       </Swipeable>
    );
 }
 
 const styles = StyleSheet.create({
    activityContainer: {
-      width: "100%",
-      padding: 5,
+      padding: 10,
       marginBottom: 10,
       borderColor: "#000",
-      borderWidth: 0.5,
-      borderRadius: 10,
+      width: "100%",
    },
    iconBox: {
       padding: 10,
@@ -192,8 +187,13 @@ const styles = StyleSheet.create({
    },
    title: {
       color: "white",
-      fontSize: 30,
-      textAlign: "center",
+      fontSize: 40,
+      textAlign: "right",
+      textShadowRadius: 10,
+      textShadowOffset: {
+         width: 3,
+         height: 3,
+      },
    },
    values: {
       fontSize: 24,

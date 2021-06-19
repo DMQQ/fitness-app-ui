@@ -83,6 +83,17 @@ export default function Water() {
       dispatch({ type: "ERROR_MESSAGE", payload: message });
    }
 
+   useEffect(() => {
+      function HideErrorModal() {
+         dispatch({ type: "HIDE_ERROR" });
+      }
+
+      if (errorModal.show) {
+         window.setTimeout(HideErrorModal, 3000);
+      }
+      return () => window.clearTimeout(HideErrorModal, 3000);
+   }, [errorModal.show]);
+
    return (
       <View style={styles.container}>
          {errorModal.show && (
